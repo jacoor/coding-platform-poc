@@ -614,7 +614,6 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                         for (let i = 1; i < errorDetails.length; i++) {
                             outputContent += `<div class="test-result test-failure"><pre>${errorDetails[i]}</pre></div>`;
                         }
-                        showAIReview(false);
                     } 
                     else {
                         outputContent += `<div class="test-result test-failure">❌ Błąd: ${result.stderr}</div>`;
@@ -628,6 +627,7 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                         showAIReview(true);
                     } else {
                         outputContent += `<pre>${result.stdout}</pre>`;
+                        showAIReview(false);
                     }
                 }
                 
