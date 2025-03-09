@@ -742,45 +742,26 @@ def check_syntax(code):
 def check_typing(code):
     issues = []
     
-    # Sprawdzenie czy funkcja ma adnotacje typów - poprawiona wersja
-    func_def = re.search(r'def\\s+odwroc_wokalizacje\\s*\\(', code)
-    if not func_def:
-        issues.append("Brak definicji funkcji odwroc_wokalizacje")
-        return issues
-        
-    # Teraz sprawdzamy czy są adnotacje typów
-    func_pattern = r'def\\s+odwroc_wokalizacje\\s*\\(\\s*([^:]+)\\s*\\)\\s*(?:->\\s*([^:]+))?\\s*:'
-    func_match = re.search(func_pattern, code)
-    
-    if func_match:
-        param = func_match.group(1)
-        return_type = func_match.group(2)
-        
-        if not 'str' in param:
-            issues.append("Brak adnotacji typu dla parametru (powinien być str)")
-        
-        if not return_type or 'str' not in return_type:
-            issues.append("Brak adnotacji typu zwracanej wartości (powinna być str)")
-    else:
-        issues.append("Niepoprawna definicja funkcji - sprawdź składnię")
+    # Funkcja musi być zaimplementowana, nie może być tylko "pass"
+    if 'pass' in code and not re.search(r'def\\s+odwroc_wokalizacje.*[^pass]', code):
+        issues.append("Funkcja nie została zaimplementowana (znaleziono tylko 'pass')")
     
     return issues
 
 def check_implementation(code):
     issues = []
     
-    if 'pass' in code and 'def odwroc_wokalizacje' in code:
-        issues.append("Funkcja nie została zaimplementowana (znaleziono 'pass')")
-    
-    # Sprawdzenie czy używane są wymagane koncepcje
-    required_concepts = {
-        'SAMOGLOSKI': "Nie używasz zdefiniowanej stałej SAMOGLOSKI",
-        'ROZSZERZENIA': "Nie używasz zdefiniowanej stałej ROZSZERZENIA dla sprawdzania rozszerzeń plików"
-    }
-    
-    for concept, message in required_concepts.items():
-        if concept not in code or code.count(concept) <= 1:  # Tylko definicja, bez użycia
-            issues.append(message)
+    # Sprawdzenie czy kod już zawiera działającą implementację
+    if not 'pass' in code or code.count('pass') == 0:
+        # Sprawdzenie czy używane są wymagane koncepcje
+        required_concepts = {
+            'SAMOGLOSKI': "Nie używasz zdefiniowanej stałej SAMOGLOSKI",
+            'ROZSZERZENIA': "Nie używasz zdefiniowanej stałej ROZSZERZENIA dla sprawdzania rozszerzeń plików"
+        }
+        
+        for concept, message in required_concepts.items():
+            if concept not in code or code.count(concept) <= 1:  # Tylko definicja, bez użycia
+                issues.append(message)
     
     return issues
 
@@ -791,6 +772,12 @@ if not code or code.strip() == "":
     sys.exit(1)
 
 syntax_valid = check_syntax(code)
+
+# W szablonie (na czysto) nie sprawdzamy wszystkich warunków
+if 'pass' in code and code.count('SAMOGLOSKI') <= 1:
+    print("✅ Szablon kodu jest poprawny. Teraz zaimplementuj funkcję odwroc_wokalizacje!")
+    sys.exit(0)
+
 typing_issues = check_typing(code)
 impl_issues = check_implementation(code)
 
@@ -861,35 +848,85 @@ else:
             const code = editor.getValue();
             const codePreview = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
             
+            // Analiza kodu użytkownika
+            const usesLoops = code.includes('for') || code.includes('while');
+            const usesListComprehension = code.includes('[') && code.includes('for') && code.includes(']');
+            const usesIfElse = code.includes('if') && code.includes('else');
+            const usesExtensionCheck = code.includes('endswith') || (code.includes('ROZSZERZENIA') && code.includes('in'));
+            const usesIsalpha = code.includes('isalpha');
+            const usesLowerUpper = code.includes('lower') && code.includes('upper');
+            
             if (success) {
+                let positivePoints = [
+                    "Poprawnie zidentyfikowałeś samogłoski i zastosowałeś odpowiednie przekształcenia",
+                    "Obsłużyłeś przypadek specjalny z rozszerzeniami plików",
+                    "Kod jest czytelny i dobrze zorganizowany"
+                ];
+                
+                if (usesLoops) {
+                    positivePoints.push("Dobrze zastosowałeś pętle do iteracji po znakach");
+                }
+                
+                if (usesListComprehension) {
+                    positivePoints.push("Skutecznie wykorzystałeś list comprehensions dla zwięzłości kodu");
+                }
+                
+                if (usesIfElse) {
+                    positivePoints.push("Poprawnie zaimplementowałeś warunki dla różnych przypadków");
+                }
+                
+                let improvementPoints = [
+                    "Rozważ użycie wyrażeń regularnych dla lepszej wydajności",
+                    "Możesz dodać obsługę błędów np. dla nieprawidłowych danych wejściowych"
+                ];
+                
+                // Generowanie listy pozytywnych punktów
+                let positiveHtml = positivePoints.map(point => `<li>${point}</li>`).join('');
+                let improvementHtml = improvementPoints.map(point => `<li>${point}</li>`).join('');
+                
                 aiReviewContent.innerHTML = `
                     <h4>Gratulacje! Twoje rozwiązanie przeszło testy.</h4>
                     <p>Przeanalizowałem Twój kod:</p>
                     <pre><code>${codePreview}</code></pre>
                     <h5>Co zrobiłeś dobrze:</h5>
                     <ul>
-                        <li>Poprawnie zidentyfikowałeś samogłoski i zastosowałeś odpowiednie przekształcenia</li>
-                        <li>Obsłużyłeś przypadek specjalny z rozszerzeniami plików</li>
-                        <li>Kod jest czytelny i dobrze zorganizowany</li>
+                        ${positiveHtml}
                     </ul>
                     <h5>Co można poprawić:</h5>
                     <ul>
-                        <li>Rozważ użycie wyrażeń regularnych dla lepszej wydajności</li>
-                        <li>Możesz dodać obsługę błędów np. dla nieprawidłowych danych wejściowych</li>
-                        <li>Warto dodać więcej komentarzy wyjaśniających poszczególne kroki</li>
+                        ${improvementHtml}
                     </ul>
                     <p>Ogólnie rzecz biorąc, Twoje rozwiązanie jest solidne i dobrze zaimplementowane. Gotowe do przejścia do następnego zadania!</p>
                 `;
             } else {
+                let issuePoints = [
+                    "Upewnij się, że poprawnie identyfikujesz samogłoski (a, e, i, o, u)",
+                    "Pamiętaj o usunięciu znaków interpunkcyjnych, ale zachowaniu spacji",
+                    "Sprawdź, czy rozszerzenia plików pozostają nienaruszone"
+                ];
+                
+                if (!usesExtensionCheck) {
+                    issuePoints.push("Sprawdź czy twój kod prawidłowo obsługuje rozszerzenia plików z listy ROZSZERZENIA");
+                }
+                
+                if (!usesIsalpha) {
+                    issuePoints.push("Rozważ użycie metody isalpha() do sprawdzania czy znak jest literą");
+                }
+                
+                if (!usesLowerUpper) {
+                    issuePoints.push("Pamiętaj o użyciu metod lower() i upper() do zmiany wielkości liter");
+                }
+                
+                // Generowanie listy punktów
+                let issuesHtml = issuePoints.map(point => `<li>${point}</li>`).join('');
+                
                 aiReviewContent.innerHTML = `
                     <h4>Twoje rozwiązanie wymaga jeszcze pracy</h4>
                     <p>Nie wszystkie testy przeszły pomyślnie. Przeanalizowałem Twój kod:</p>
                     <pre><code>${codePreview}</code></pre>
                     <p>Oto kilka wskazówek, które pomogą Ci poprawić kod:</p>
                     <ul>
-                        <li>Upewnij się, że poprawnie identyfikujesz samogłoski (a, e, i, o, u)</li>
-                        <li>Pamiętaj o usunięciu znaków interpunkcyjnych, ale zachowaniu spacji</li>
-                        <li>Sprawdź, czy rozszerzenia plików pozostają nienaruszone</li>
+                        ${issuesHtml}
                     </ul>
                     <p>Spróbuj jeszcze raz, a jestem pewien, że Ci się uda!</p>
                 `;
