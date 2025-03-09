@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyMasters Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.0/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.0/mode-python.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.0/theme-monokai.js"></script>
+    <style>
+        :root {
+            --primary-color: #23afd0;
+            --secondary-color: #1d2733;
+            --bg-color: #1a222d;
+            --text-color: #ffffff;
+            --accent-color: #31b9d8;
+            --border-color: #2c3a4a;
+            --success-color: #27ae60;
+            --failure-color: #e74c3c;
+            --warning-color: #f1c40f;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        header {
+            background-color: var(--secondary-color);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .logo-icon {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+        
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--accent-color);
+        }
+        
+        main {
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .lesson-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+        
+        .lesson-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .badge {
+            background-color: #364151;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+        }
+        
+        .lesson-description {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .video-container {
+            width: 100%;
+            background-color: #151d28;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            text-align: center;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+        
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: #2a384a;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .code-editor {
+            border-radius: 6px;
+            overflow: hidden;
+            height: 300px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+        
+        .editor-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .task-description {
+            background-color: #283544;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .test-output {
+            background-color: #1e2b3a;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        
+        .function-spec {
+            background-color: #283544;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .function-spec code {
+            background-color: #1e2b3a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+        }
+        
+        .assistant-container {
+            background-color: #283544;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .assistant-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .assistant-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .assistant-content {
+            line-height: 1.6;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .test-result {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .test-success {
+            background-color: rgba(39, 174, 96, 0.2);
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .test-failure {
+            background-color: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid var(--failure-color);
+        }
+        
+        .lint-error {
+            background-color: rgba(241, 196, 15, 0.2);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid var(--primary-color);
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .test-status {
+            font-weight: bold;
+            display: inline-block;
+            width: 70px;
+            text-align: center;
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        
+        .status-pass {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .status-fail {
+            background-color: var(--failure-color);
+            color: white;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span class="logo-icon">&#9672;</span> PyMasters Platform
+        </div>
+        <nav>
+            <a href="#">Lekcje</a>
+            <a href="#">Ścieżki</a>
+            <a href="#">Społeczność</a>
+            <a href="#">Pomoc</a>
+        </nav>
+        <button class="btn">DOŁĄCZ</button>
+    </header>
+    
+    <main>
+        <h1 class="lesson-title">Manipulacja tekstem - Odwracanie wokalizacji</h1>
+        <div class="lesson-meta">
+            <span class="badge">Poziom: Początkujący</span>
+            <span class="badge">Punkty: 5</span>
+        </div>
+        
+        <div class="lesson-description">
+            <p>W tej lekcji nauczysz się pisać funkcję, która manipuluje tekstem według określonych reguł. To doskonały sposób na ćwiczenie pracy z łańcuchami znaków w Pythonie i zrozumienie zasad przetwarzania tekstu.</p>
+        </div>
+        
+        <div class="video-container">
+            <img src="/api/placeholder/800/450" alt="Tutorial Video Placeholder">
+            <p>Tutaj będzie wideo z lekcją</p>
+        </div>
+        
+        <div class="task-description">
+            <h3>Zadanie: Odwracanie wokalizacji</h3>
+            <p>Napisz funkcję, która przetwarza tekst według następujących zasad:</p>
+            <ul>
+                <li>Wszystkie samogłoski (a, e, i, o, u) muszą być zamienione na wielkie litery</li>
+                <li>Wszystkie spółgłoski muszą być zamienione na małe litery</li>
+                <li>Znaki interpunkcyjne powinny zostać usunięte</li>
+                <li>Spacje powinny pozostać nienaruszone</li>
+                <li>Jeśli przetwarzany jest plik, rozszerzenie pliku nie powinno być modyfikowane</li>
+            </ul>
+        </div>
+        
+        <div class="function-spec">
+            <h3>Specyfikacja funkcji:</h3>
+            <p>Funkcja <code>odwroc_wokalizacje</code> przyjmuje albo <code>string</code> albo <code>nazwę_pliku</code> i zwraca <code>string</code> z samogłoskami zamienionymi na wielkie litery.</p>
+            <p>Parametry:</p>
+            <ul>
+                <li><code>text: str</code> - tekst do przetworzenia lub nazwa pliku</li>
+            </ul>
+            <p>Zwraca:</p>
+            <ul>
+                <li><code>str</code> - Przekształcony tekst</li>
+            </ul>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="code">Kod</button>
+            <button class="tab" data-tab="tests">Testy</button>
+        </div>
+        
+        <div id="code-tab" class="tab-content active">
+            <div id="editor" class="code-editor">SAMOGLOSKI = "aeiou"
+ROZSZERZENIA = [".mp3", ".jpg", ".jpeg", ".pdf", ".txt", ".mp4", ".png", ".exe"]
+
+def odwroc_wokalizacje(text: str) -> str:
+    """
+    Przetwarza tekst zamieniając samogłoski na wielkie litery,
+    spółgłoski na małe litery i usuwając znaki interpunkcyjne.
+    
+    Args:
+        text: Tekst do przetworzenia lub nazwa pliku
+        
+    Returns:
+        Przetworzony tekst
+    """
+    # Twój kod tutaj
+    pass</div>
+            
+            <div class="editor-controls">
+                <button class="btn" id="run-code">Uruchom</button>
+                <button class="btn" id="lint-code">Lint</button>
+            </div>
+            
+            <div id="output" class="test-output hidden"></div>
+        </div>
+        
+        <div id="tests-tab" class="tab-content">
+            <h3>Przykładowe testy:</h3>
+            <div id="tests-editor" class="code-editor">import unittest
+
+class TestOdwrocWokalizacje(unittest.TestCase):
+    def test_basic_functionality(self):
+        self.assertEqual(odwroc_wokalizacje("Hello, World!"), "hEllO wOrld")
+        
+    def test_numbers_and_specials(self):
+        self.assertEqual(odwroc_wokalizacje("Python 3.9"), "pythOn 39")
+        
+    def test_file_extension(self):
+        self.assertEqual(odwroc_wokalizacje("example.txt"), "ExAmplE.txt")
+        
+    def test_uppercase(self):
+        self.assertEqual(odwroc_wokalizacje("UPPERCASE"), "UppErcAsE")
+        
+    def test_lowercase(self):
+        self.assertEqual(odwroc_wokalizacje("lowercase"), "lOwErcAsE")
+        
+    def test_mixed_case(self):
+        self.assertEqual(odwroc_wokalizacje("Mixed-Case!"), "mIxEdcAsE")</div>
+            
+            <p>Powyższe testy są publiczne. Istnieją również ukryte testy, które sprawdzą dodatkowe przypadki.</p>
+            
+            <button class="btn" id="run-tests">Uruchom testy</button>
+            
+            <div id="test-output" class="test-output hidden"></div>
+        </div>
+        
+        <div class="assistant-container">
+            <div class="assistant-header">
+                <div class="assistant-avatar">AI</div>
+                <h3>Asystent PyMasters</h3>
+            </div>
+            <div class="assistant-content">
+                <p>Witaj! Widzę, że pracujesz nad zadaniem manipulacji tekstem. Oto kilka wskazówek, które mogą Ci pomóc:</p>
+                <ul>
+                    <li>Zastanów się, jak rozpoznać czy tekst jest nazwą pliku (sprawdź, czy zawiera rozszerzenie z listy ROZSZERZENIA)</li>
+                    <li>Możesz użyć metody <code>lower()</code> i <code>upper()</code> do zmiany wielkości liter</li>
+                    <li>Zbuduj wynik znak po znaku, sprawdzając każdy znak w pętli</li>
+                    <li>Użyj <code>isalpha()</code>, aby sprawdzić, czy znak jest literą</li>
+                </ul>
+                <p>Kiedy uruchomisz swój kod, chętnie przeanalizuję Twoje rozwiązanie i zaproponuję ewentualne usprawnienia!</p>
+            </div>
+        </div>
+        
+        <div id="ai-review" class="assistant-container hidden">
+            <div class="assistant-header">
+                <div class="assistant-avatar">AI</div>
+                <h3>Analiza rozwiązania</h3>
+            </div>
+            <div class="assistant-content" id="ai-review-content">
+                <!-- AI będzie tutaj generować analizę kodu -->
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 PyMasters Platform. Wszystkie prawa zastrzeżone.</p>
+    </footer>
+    
+    <script>
+        // Inicjalizacja edytorów kodu
+        const editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/python");
+        editor.setFontSize(14);
+        
+        const testsEditor = ace.edit("tests-editor");
+        testsEditor.setTheme("ace/theme/monokai");
+        testsEditor.session.setMode("ace/mode/python");
+        testsEditor.setFontSize(14);
+        testsEditor.setReadOnly(true);  // Testy są tylko do odczytu
+        
+        // Obsługa zakładek
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const tabId = tab.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabId + '-tab').classList.add('active');
+            });
+        });
+        
+        // Funkcja do przesyłania kodu do Judge0 API
+        async function submitToJudge0(code, language_id = 71) {  // 71 to ID dla Pythona 3
+            const encodedCode = btoa(unescape(encodeURIComponent(code)));
+            
+            const options = {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                    'X-RapidAPI-Key': '79dfa15cbdmsh8031319b3d7e30ep18a717jsn3d23dbcea455',
+                    'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+                },
+                body: JSON.stringify({
+                    source_code: encodedCode,
+                    language_id: language_id,
+                    stdin: '',
+                    expected_output: ''
+                })
+            };
+            
+            try {
+                const response = await fetch('https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=false', options);
+                const data = await response.json();
+                return data.token;
+            } catch (error) {
+                console.error('Error submitting code:', error);
+                return null;
+            }
+        }
+        
+        // Funkcja do oczekiwania na wynik wykonania kodu
+        async function getJudge0Result(token) {
+            const options = {
+                method: 'GET',
+                headers: {
+                    'X-RapidAPI-Key': '79dfa15cbdmsh8031319b3d7e30ep18a717jsn3d23dbcea455',
+                    'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+                }
+            };
+            
+            let attempts = 0;
+            while (attempts < 10) {  // Maksymalnie 10 prób
+                try {
+                    const response = await fetch(`https://judge0-ce.p.rapidapi.com/submissions/${token}?base64_encoded=true`, options);
+                    const data = await response.json();
+                    
+                    if (data.status && (data.status.id >= 3)) {  // Status 3 i wyżej oznacza zakończenie wykonania
+                        // Dekodowanie wyników
+                        if (data.stdout) {
+                            data.stdout = decodeURIComponent(escape(atob(data.stdout)));
+                        }
+                        if (data.stderr) {
+                            data.stderr = decodeURIComponent(escape(atob(data.stderr)));
+                        }
+                        if (data.compile_output) {
+                            data.compile_output = decodeURIComponent(escape(atob(data.compile_output)));
+                        }
+                        return data;
+                    }
+                    
+                    // Jeśli wykonanie jeszcze trwa, poczekaj przed następną próbą
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    attempts++;
+                } catch (error) {
+                    console.error('Error getting results:', error);
+                    attempts++;
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+            
+            return null;  // Przekroczono limit prób
+        }
+        
+        // Funkcja do wykonania testów
+        async function runTests() {
+            const code = editor.getValue();
+            const tests = testsEditor.getValue();
+            const testOutput = document.getElementById('test-output');
+            testOutput.classList.remove('hidden');
+            
+            // Pokazanie loadera
+            testOutput.innerHTML = '<div class="loader"></div> Wykonywanie testów...';
+            
+            // Przygotowanie pełnego skryptu z kodem i testami
+            const fullScript = `${code}\n\n${tests}\n\n# Run tests\nif __name__ == '__main__':\n    unittest.main()`;
+            
+            try {
+                // Przesłanie kodu z testami do Judge0
+                const token = await submitToJudge0(fullScript);
+                if (!token) {
+                    testOutput.innerHTML = '<div class="test-result test-failure">❌ Błąd podczas przesyłania kodu</div>';
+                    return;
+                }
+                
+                // Oczekiwanie na wyniki wykonania
+                const result = await getJudge0Result(token);
+                if (!result) {
+                    testOutput.innerHTML = '<div class="test-result test-failure">❌ Nie udało się pobrać wyników wykonania</div>';
+                    return;
+                }
+                
+                // Analiza wyników
+                let outputContent = '';
+                
+                if (result.stderr) {
+                    // Sprawdzenie czy są błędy składniowe
+                    if (result.stderr.includes('SyntaxError')) {
+                        outputContent += `<div class="test-result test-failure">❌ Błąd składni: ${result.stderr}</div>`;
+                    } 
+                    // Analiza wyniku testów unittest
+                    else if (result.stderr.includes('FAILED')) {
+                        const lines = result.stderr.split('\n');
+                        const failedTests = [];
+                        const errorTests = [];
+                        
+                        for (const line of lines) {
+                            if (line.includes('FAIL:')) {
+                                failedTests.push(line);
+                            } else if (line.includes('ERROR:')) {
+                                errorTests.push(line);
+                            }
+                        }
+                        
+                        for (const test of failedTests) {
+                            outputContent += `<div class="test-result test-failure">❌ ${test}</div>`;
+                        }
+                        
+                        for (const test of errorTests) {
+                            outputContent += `<div class="test-result test-failure">❌ ${test}</div>`;
+                        }
+                        
+                        // Dodaj szczegóły błędów
+                        const errorDetails = result.stderr.split('======================================================================');
+                        for (let i = 1; i < errorDetails.length; i++) {
+                            outputContent += `<div class="test-result test-failure"><pre>${errorDetails[i]}</pre></div>`;
+                        }
+                    } 
+                    else {
+                        outputContent += `<div class="test-result test-failure">❌ Błąd: ${result.stderr}</div>`;
+                    }
+                }
+                
+                if (result.stdout) {
+                    if (result.stdout.includes('OK')) {
+                        outputContent += '<div class="test-result test-success">✅ Wszystkie testy przeszły pomyślnie!</div>';
+                        // Pokaż AI review dla pomyślnych testów
+                        showAIReview(true);
+                    } else {
+                        outputContent += `<pre>${result.stdout}</pre>`;
+                    }
+                }
+                
+                // Jeśli nie ma ani stdout ani stderr, coś poszło nie tak
+                if (!result.stdout && !result.stderr) {
+                    outputContent += '<div class="test-result test-failure">❌ Brak wyniku wykonania</div>';
+                    if (result.compile_output) {
+                        outputContent += `<div class="test-result test-failure">Błąd kompilacji: ${result.compile_output}</div>`;
+                    }
+                }
+                
+                testOutput.innerHTML = outputContent;
+            } catch (error) {
+                console.error('Error in runTests:', error);
+                testOutput.innerHTML = `<div class="test-result test-failure">❌ Wystąpił błąd: ${error.message}</div>`;
+            }
+        }
+        
+        // Funkcja do uruchomienia kodu bez testów
+        async function runCode() {
+            const code = editor.getValue();
+            const output = document.getElementById('output');
+            output.classList.remove('hidden');
+            
+            // Pokazanie loadera
+            output.innerHTML = '<div class="loader"></div> Wykonywanie kodu...';
+            
+            // Testowy przypadek - teraz z wszystkimi testami i wyraźnym oznaczeniem wyników
+            const testCase = `
+# Funkcja do testowania wyniku
+def test_case(input_str, expected, test_name):
+    result = odwroc_wokalizacje(input_str)
+    status = "PASS" if result == expected else "FAIL"
+    status_class = "status-pass" if result == expected else "status-fail"
+    print(f'<span class="test-status {status_class}">{status}</span> {test_name}: "{input_str}" → "{result}" {"==" if result == expected else "!="} "{expected}"')
+
+# Wykonanie wszystkich testów
+print("<div class='test-result test-success'>")
+test_case("Hello, World!", "hEllO wOrld", "Test 1: Podstawowy")
+test_case("Python 3.9", "pythOn 39", "Test 2: Liczby")
+test_case("example.txt", "ExAmplE.txt", "Test 3: Rozszerzenie pliku")
+test_case("UPPERCASE", "UppErcAsE", "Test 4: Wielkie litery")
+test_case("lowercase", "lOwErcAsE", "Test 5: Małe litery")
+test_case("Mixed-Case!", "mIxEdcAsE", "Test 6: Mieszane z interpunkcją")
+print("</div>")
+`;
+            
+            const fullScript = `${code}\n\n${testCase}`;
+            
+            try {
+                // Przesłanie kodu do Judge0
+                const token = await submitToJudge0(fullScript);
+                if (!token) {
+                    output.innerHTML = '<div class="test-result test-failure">❌ Błąd podczas przesyłania kodu</div>';
+                    return;
+                }
+                
+                // Oczekiwanie na wyniki wykonania
+                const result = await getJudge0Result(token);
+                if (!result) {
+                    output.innerHTML = '<div class="test-result test-failure">❌ Nie udało się pobrać wyników wykonania</div>';
+                    return;
+                }
+                
+                // Analiza wyników
+                let outputContent = '';
+                
+                if (result.stderr) {
+                    outputContent += `<div class="test-result test-failure">❌ Błąd: ${result.stderr}</div>`;
+                }
+                
+                if (result.stdout) {
+                    outputContent += result.stdout;
+                }
+                
+                // Jeśli nie ma ani stdout ani stderr, coś poszło nie tak
+                if (!result.stdout && !result.stderr) {
+                    outputContent += '<div class="test-result test-failure">❌ Brak wyniku wykonania</div>';
+                    if (result.compile_output) {
+                        outputContent += `<div class="test-result test-failure">Błąd kompilacji: ${result.compile_output}</div>`;
+                    }
+                }
+                
+                output.innerHTML = outputContent;
+            } catch (error) {
+                console.error('Error in runCode:', error);
+                output.innerHTML = `<div class="test-result test-failure">❌ Wystąpił błąd: ${error.message}</div>`;
+            }
+        }
+        
+        // Funkcja do sprawdzania linta - poprawiona wersja
+        async function lintCode() {
+            const code = editor.getValue();
+            const output = document.getElementById('output');
+            output.classList.remove('hidden');
+            
+            // Pokazanie loadera
+            output.innerHTML = '<div class="loader"></div> Sprawdzanie linta...';
+            
+            // Skrypt do przeprowadzenia lintingu - poprawiona wersja
+            const lintScript = `
+import sys
+import re
+
+def check_syntax(code):
+    try:
+        compile(code, '<string>', 'exec')
+        return True
+    except SyntaxError as e:
+        print(f"Błąd składni: {str(e)}")
+        return False
+
+def check_typing(code):
+    issues = []
+    
+    # Sprawdzenie czy funkcja ma adnotacje typów - poprawiona wersja
+    func_def = re.search(r'def\\s+odwroc_wokalizacje\\s*\\(', code)
+    if not func_def:
+        issues.append("Brak definicji funkcji odwroc_wokalizacje")
+        return issues
+        
+    # Teraz sprawdzamy czy są adnotacje typów
+    func_pattern = r'def\\s+odwroc_wokalizacje\\s*\\(\\s*([^:]+)\\s*\\)\\s*(?:->\\s*([^:]+))?\\s*:'
+    func_match = re.search(func_pattern, code)
+    
+    if func_match:
+        param = func_match.group(1)
+        return_type = func_match.group(2)
+        
+        if not 'str' in param:
+            issues.append("Brak adnotacji typu dla parametru (powinien być str)")
+        
+        if not return_type or 'str' not in return_type:
+            issues.append("Brak adnotacji typu zwracanej wartości (powinna być str)")
+    else:
+        issues.append("Niepoprawna definicja funkcji - sprawdź składnię")
+    
+    return issues
+
+def check_implementation(code):
+    issues = []
+    
+    if 'pass' in code and 'def odwroc_wokalizacje' in code:
+        issues.append("Funkcja nie została zaimplementowana (znaleziono 'pass')")
+    
+    # Sprawdzenie czy używane są wymagane koncepcje
+    required_concepts = {
+        'SAMOGLOSKI': "Nie używasz zdefiniowanej stałej SAMOGLOSKI",
+        'ROZSZERZENIA': "Nie używasz zdefiniowanej stałej ROZSZERZENIA dla sprawdzania rozszerzeń plików"
+    }
+    
+    for concept, message in required_concepts.items():
+        if concept not in code or code.count(concept) <= 1:  # Tylko definicja, bez użycia
+            issues.append(message)
+    
+    return issues
+
+code = """${code.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"""
+
+if not code or code.strip() == "":
+    print("Kod jest pusty")
+    sys.exit(1)
+
+syntax_valid = check_syntax(code)
+typing_issues = check_typing(code)
+impl_issues = check_implementation(code)
+
+all_issues = typing_issues + impl_issues
+
+if not syntax_valid:
+    sys.exit(1)
+
+if all_issues:
+    for issue in all_issues:
+        print(f"- {issue}")
+    sys.exit(1)
+else:
+    print("✅ Kod przeszedł sprawdzenie lintera")
+`;
+            
+            try {
+                // Przesłanie skryptu lintującego do Judge0
+                const token = await submitToJudge0(lintScript);
+                if (!token) {
+                    output.innerHTML = '<div class="test-result test-failure">❌ Błąd podczas przesyłania kodu</div>';
+                    return;
+                }
+                
+                // Oczekiwanie na wyniki wykonania
+                const result = await getJudge0Result(token);
+                if (!result) {
+                    output.innerHTML = '<div class="test-result test-failure">❌ Nie udało się pobrać wyników sprawdzenia</div>';
+                    return;
+                }
+                
+                // Analiza wyników
+                let outputContent = '';
+                
+                if (result.stderr) {
+                    outputContent += `<div class="test-result test-failure">❌ Błąd podczas lintowania: ${result.stderr}</div>`;
+                }
+                
+                if (result.stdout) {
+                    if (result.stdout.includes("✅")) {
+                        outputContent += `<div class="test-result test-success">${result.stdout}</div>`;
+                    } else {
+                        outputContent += `<div class="test-result lint-error">❌ Problemy z kodem:\n${result.stdout}</div>`;
+                    }
+                }
+                
+                // Jeśli nie ma ani stdout ani stderr, coś poszło nie tak
+                if (!result.stdout && !result.stderr) {
+                    outputContent += '<div class="test-result test-failure">❌ Brak wyniku sprawdzenia</div>';
+                    if (result.compile_output) {
+                        outputContent += `<div class="test-result test-failure">Błąd: ${result.compile_output}</div>`;
+                    }
+                }
+                
+                output.innerHTML = outputContent;
+            } catch (error) {
+                console.error('Error in lintCode:', error);
+                output.innerHTML = `<div class="test-result test-failure">❌ Wystąpił błąd: ${error.message}</div>`;
+            }
+        }
+        
+        // Wyświetlanie analizy AI po rozwiązaniu
+        function showAIReview(success) {
+            const aiReview = document.getElementById('ai-review');
+            const aiReviewContent = document.getElementById('ai-review-content');
+            aiReview.classList.remove('hidden');
+            
+            const code = editor.getValue();
+            const codePreview = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            if (success) {
+                aiReviewContent.innerHTML = `
+                    <h4>Gratulacje! Twoje rozwiązanie przeszło testy.</h4>
+                    <p>Przeanalizowałem Twój kod:</p>
+                    <pre><code>${codePreview}</code></pre>
+                    <h5>Co zrobiłeś dobrze:</h5>
+                    <ul>
+                        <li>Poprawnie zidentyfikowałeś samogłoski i zastosowałeś odpowiednie przekształcenia</li>
+                        <li>Obsłużyłeś przypadek specjalny z rozszerzeniami plików</li>
+                        <li>Kod jest czytelny i dobrze zorganizowany</li>
+                    </ul>
+                    <h5>Co można poprawić:</h5>
+                    <ul>
+                        <li>Rozważ użycie wyrażeń regularnych dla lepszej wydajności</li>
+                        <li>Możesz dodać obsługę błędów np. dla nieprawidłowych danych wejściowych</li>
+                        <li>Warto dodać więcej komentarzy wyjaśniających poszczególne kroki</li>
+                    </ul>
+                    <p>Ogólnie rzecz biorąc, Twoje rozwiązanie jest solidne i dobrze zaimplementowane. Gotowe do przejścia do następnego zadania!</p>
+                `;
+            } else {
+                aiReviewContent.innerHTML = `
+                    <h4>Twoje rozwiązanie wymaga jeszcze pracy</h4>
+                    <p>Nie wszystkie testy przeszły pomyślnie. Przeanalizowałem Twój kod:</p>
+                    <pre><code>${codePreview}</code></pre>
+                    <p>Oto kilka wskazówek, które pomogą Ci poprawić kod:</p>
+                    <ul>
+                        <li>Upewnij się, że poprawnie identyfikujesz samogłoski (a, e, i, o, u)</li>
+                        <li>Pamiętaj o usunięciu znaków interpunkcyjnych, ale zachowaniu spacji</li>
+                        <li>Sprawdź, czy rozszerzenia plików pozostają nienaruszone</li>
+                    </ul>
+                    <p>Spróbuj jeszcze raz, a jestem pewien, że Ci się uda!</p>
+                `;
+            }
+        }
+        
+        // Przypisanie funkcji do przycisków
+        document.getElementById('run-tests').addEventListener('click', runTests);
+        document.getElementById('lint-code').addEventListener('click', lintCode);
+        document.getElementById('run-code').addEventListener('click', runCode);
+        
+        // Inicjalizacja highlight.js dla kodu
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+        });
+    </script>
+</body>
+</html>
