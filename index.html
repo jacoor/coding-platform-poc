@@ -569,6 +569,7 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                 const token = await submitToJudge0(fullScript);
                 if (!token) {
                     testOutput.innerHTML = '<div class="test-result test-failure">❌ Błąd podczas przesyłania kodu</div>';
+                    showAIReview(false);
                     return;
                 }
                 
@@ -576,6 +577,7 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                 const result = await getJudge0Result(token);
                 if (!result) {
                     testOutput.innerHTML = '<div class="test-result test-failure">❌ Nie udało się pobrać wyników wykonania</div>';
+                    showAIReview(false);
                     return;
                 }
                 
@@ -618,6 +620,7 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                     } 
                     else {
                         outputContent += `<div class="test-result test-failure">❌ Błąd: ${result.stderr}</div>`;
+                        showAIReview(false);
                     }
                 }
                 
@@ -638,12 +641,14 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                     if (result.compile_output) {
                         outputContent += `<div class="test-result test-failure">Błąd kompilacji: ${result.compile_output}</div>`;
                     }
+                    showAIReview(false);
                 }
                 
                 testOutput.innerHTML = outputContent;
             } catch (error) {
                 console.error('Error in runTests:', error);
                 testOutput.innerHTML = `<div class="test-result test-failure">❌ Wystąpił błąd: ${error.message}</div>`;
+                showAIReview(false);
             }
         }
         
@@ -656,7 +661,7 @@ class TestOdwrocWokalizacje(unittest.TestCase):
             // Pokazanie loadera
             output.innerHTML = '<div class="loader"></div> Wykonywanie kodu...';
             
-            // Testowy przypadek - teraz z wszystkimi testami i wyraźnym oznaczeniem wyników
+            // Testowy przypadek - z kontrolą wszystkich testów i ich powodzenia
             const testCase = `
 # Funkcja do testowania wyniku
 def test_case(input_str, expected, test_name):
@@ -664,26 +669,33 @@ def test_case(input_str, expected, test_name):
     status = "PASS" if result == expected else "FAIL"
     status_class = "status-pass" if result == expected else "status-fail"
     print(f'<span class="test-status {status_class}">{status}</span> {test_name}: "{input_str}" → "{result}" {"==" if result == expected else "!="} "{expected}"')
+    return result == expected
 
 # Wykonanie wszystkich testów
 print("<div class='test-result test-success'>")
-test_case("Hello, World!", "hEllO wOrld", "Test 1: Podstawowy")
-test_case("Python 3.9", "pythOn 39", "Test 2: Liczby")
-test_case("example.txt", "ExAmplE.txt", "Test 3: Rozszerzenie pliku")
-test_case("UPPERCASE", "UppErcAsE", "Test 4: Wielkie litery")
-test_case("lowercase", "lOwErcAsE", "Test 5: Małe litery")
-test_case("Mixed-Case!", "mIxEdcAsE", "Test 6: Mieszane z interpunkcją")
+test_results = []
+test_results.append(test_case("Hello, World!", "hEllO wOrld", "Test 1: Podstawowy"))
+test_results.append(test_case("Python 3.9", "pythOn 39", "Test 2: Liczby"))
+test_results.append(test_case("example.txt", "ExAmplE.txt", "Test 3: Rozszerzenie pliku"))
+test_results.append(test_case("UPPERCASE", "UppErcAsE", "Test 4: Wielkie litery"))
+test_results.append(test_case("lowercase", "lOwErcAsE", "Test 5: Małe litery"))
+test_results.append(test_case("Mixed-Case!", "mIxEdcAsE", "Test 6: Mieszane z interpunkcją"))
+
+if all(test_results):
+    print("\\n✅ WSZYSTKIE TESTY PRZESZŁY POMYŚLNIE!")
+else:
+    print("\\n❌ NIEKTÓRE TESTY NIE PRZESZŁY.")
 print("</div>")
 `;
             
             const fullScript = `${code}\n\n${testCase}`;
-            showAIReview(false);
             
             try {
                 // Przesłanie kodu do Judge0
                 const token = await submitToJudge0(fullScript);
                 if (!token) {
                     output.innerHTML = '<div class="test-result test-failure">❌ Błąd podczas przesyłania kodu</div>';
+                    showAIReview(false);
                     return;
                 }
                 
@@ -691,18 +703,24 @@ print("</div>")
                 const result = await getJudge0Result(token);
                 if (!result) {
                     output.innerHTML = '<div class="test-result test-failure">❌ Nie udało się pobrać wyników wykonania</div>';
+                    showAIReview(false);
                     return;
                 }
                 
                 // Analiza wyników
                 let outputContent = '';
+                let allTestsPassed = false;
                 
                 if (result.stderr) {
                     outputContent += `<div class="test-result test-failure">❌ Błąd: ${result.stderr}</div>`;
+                    showAIReview(false);
                 }
                 
                 if (result.stdout) {
                     outputContent += result.stdout;
+                    // Sprawdzenie czy wszystkie testy przeszły
+                    allTestsPassed = result.stdout.includes("WSZYSTKIE TESTY PRZESZŁY POMYŚLNIE");
+                    showAIReview(allTestsPassed);
                 }
                 
                 // Jeśli nie ma ani stdout ani stderr, coś poszło nie tak
@@ -711,16 +729,18 @@ print("</div>")
                     if (result.compile_output) {
                         outputContent += `<div class="test-result test-failure">Błąd kompilacji: ${result.compile_output}</div>`;
                     }
+                    showAIReview(false);
                 }
                 
                 output.innerHTML = outputContent;
             } catch (error) {
                 console.error('Error in runCode:', error);
                 output.innerHTML = `<div class="test-result test-failure">❌ Wystąpił błąd: ${error.message}</div>`;
+                showAIReview(false);
             }
         }
         
-        // Funkcja do sprawdzania linta - poprawiona wersja
+        // Funkcja do sprawdzania linta
         async function lintCode() {
             const code = editor.getValue();
             const output = document.getElementById('output');
@@ -729,7 +749,7 @@ print("</div>")
             // Pokazanie loadera
             output.innerHTML = '<div class="loader"></div> Sprawdzanie linta...';
             
-            // Skrypt do przeprowadzenia lintingu - poprawiona wersja
+            // Skrypt do przeprowadzenia lintingu
             const lintScript = `
 import sys
 import re
@@ -832,7 +852,6 @@ else:
                     outputContent += '<div class="test-result test-failure">❌ Brak wyniku sprawdzenia</div>';
                     if (result.compile_output) {
                         outputContent += `<div class="test-result test-failure">Błąd: ${result.compile_output}</div>`;
-                        showAIReview(false); // Dodaj tę linię
                     }
                 }
                 
@@ -840,7 +859,6 @@ else:
             } catch (error) {
                 console.error('Error in lintCode:', error);
                 output.innerHTML = `<div class="test-result test-failure">❌ Wystąpił błąd: ${error.message}</div>`;
-                showAIReview(false); // Dodaj tę linię
             }
         }
         
