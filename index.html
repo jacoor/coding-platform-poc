@@ -831,6 +831,7 @@ else:
                     outputContent += '<div class="test-result test-failure">❌ Brak wyniku sprawdzenia</div>';
                     if (result.compile_output) {
                         outputContent += `<div class="test-result test-failure">Błąd: ${result.compile_output}</div>`;
+                        showAIReview(false); // Dodaj tę linię
                     }
                 }
                 
@@ -838,6 +839,7 @@ else:
             } catch (error) {
                 console.error('Error in lintCode:', error);
                 output.innerHTML = `<div class="test-result test-failure">❌ Wystąpił błąd: ${error.message}</div>`;
+                showAIReview(false); // Dodaj tę linię
             }
         }
         
