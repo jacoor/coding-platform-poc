@@ -1934,39 +1934,77 @@ else:
         }
         
         // Wyświetlanie analizy AI po rozwiązaniu
-        async function showAIReview(success, testResults) {
-            const aiReviewContent = document.getElementById('ai-review-content');
-            const code = editor.getValue();
-            
-            // Pokazanie loadera w sekcji analizy
-            aiReviewContent.innerHTML = '<div class="loader"></div> AI analizuje twój kod...';
-            
-            // Jeśli kod zawiera tylko pass, to pokazujemy domyślne wskazówki
-            if (code.includes('pass') && !code.includes('return')) {
-                aiReviewContent.innerHTML = `
-                    <p>Zaimplementuj funkcję <code>odwroc_wokalizacje</code> zgodnie z wymaganiami zadania.</p>
-                    <p>Pamiętaj o następujących zasadach:</p>
-                    <ul>
-                        <li>Wszystkie samogłoski (a, e, i, o, u) muszą być zamienione na wielkie litery</li>
-                        <li>Wszystkie spółgłoski muszą być zamienione na małe litery</li>
-                        <li>Znaki interpunkcyjne powinny zostać usunięte</li>
-                        <li>Spacje powinny pozostać nienaruszone</li>
-                        <li>Jeśli przetwarzany jest plik, rozszerzenie pliku nie powinno być modyfikowane</li>
-                    </ul>
-                    <p>Kiedy zaimplementujesz rozwiązanie, uruchom kod, aby sprawdzić czy działa poprawnie.</p>
-                `;
-                return;
-            }
-            
-            // Pobierz analizę kodu z AI API
-            try {
-                const analysis = await getAICodeAnalysis(code, testResults, success);
-                aiReviewContent.innerHTML = analysis.replace(/\n/g, '<br>');
-            } catch (error) {
-                console.error('Error getting AI analysis:', error);
-                aiReviewContent.innerHTML = `<p>Wystąpił błąd podczas analizy kodu: ${error.message}</p>`;
+// Funkcja wyświetlająca analizy AI po rozwiązaniu
+async function showAIReview(success, testResults) {
+    const aiReviewContent = document.getElementById('ai-review-content');
+    const code = editor.getValue();
+    
+    // Pokazanie loadera w sekcji analizy
+    aiReviewContent.innerHTML = '<div class="loader"></div> AI analizuje twój kod...';
+    
+    // Jeśli kod zawiera tylko pass, to pokazujemy domyślne wskazówki
+    if (code.includes('pass') && !code.includes('return')) {
+        aiReviewContent.innerHTML = `
+            <p>Zaimplementuj funkcję <code>odwroc_wokalizacje</code> zgodnie z wymaganiami zadania.</p>
+            <p>Pamiętaj o następujących zasadach:</p>
+            <ul>
+                <li>Wszystkie samogłoski (a, e, i, o, u) muszą być zamienione na wielkie litery</li>
+                <li>Wszystkie spółgłoski muszą być zamienione na małe litery</li>
+                <li>Znaki interpunkcyjne powinny zostać usunięte</li>
+                <li>Spacje powinny pozostać nienaruszone</li>
+                <li>Jeśli przetwarzany jest plik, rozszerzenie pliku nie powinno być modyfikowane</li>
+            </ul>
+            <p>Kiedy zaimplementujesz rozwiązanie, uruchom kod, aby sprawdzić czy działa poprawnie.</p>
+        `;
+        return;
+    }
+    
+    // Pobierz analizę kodu z AI API
+    try {
+        const analysis = await getAICodeAnalysis(code, testResults, success);
+        
+        // Funkcja pomocnicza do escapowania HTML
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        // Przetwarzanie bloków kodu
+        let formattedContent = analysis.replace(/```([\w]*)\n([\s\S]*?)```/g, function(match, language, code) {
+            // Escapuj HTML w kodzie i zachowaj znaki nowej linii
+            return `<div class="code-block">
+                        <div class="code-header">
+                            <span>${language || 'kod'}</span>
+                        </div>
+                        <pre><code class="${language || ''}">${escapeHtml(code)}</code></pre>
+                    </div>`;
+        });
+        
+        // Zamień znaki nowej linii na <br> tylko w zwykłym tekście (poza blokami kodu)
+        let parts = formattedContent.split(/<div class="code-block">|<\/pre><\/div>/);
+        for (let i = 0; i < parts.length; i++) {
+            // Części o parzystych indeksach to zwykły tekst
+            if (i % 2 === 0) {
+                parts[i] = parts[i].replace(/\n/g, '<br>');
             }
         }
+        formattedContent = parts.join('');
+        
+        aiReviewContent.innerHTML = `<div class="ai-content">${formattedContent}</div>`;
+        
+        // Podświetl składnię kodu
+        aiReviewContent.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightBlock(block);
+        });
+    } catch (error) {
+        console.error('Error getting AI analysis:', error);
+        aiReviewContent.innerHTML = `<p>Wystąpił błąd podczas analizy kodu: ${error.message}</p>`;
+    }
+}
         
         // Przypisanie funkcji do przycisków
         document.getElementById('run-tests').addEventListener('click', runTests);
