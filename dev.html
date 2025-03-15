@@ -670,8 +670,8 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                 
                 <p>Wybierz tryb:</p>
                 <div class="api-mode-selector">
-                    <div class="mode-option selected" data-mode="direct">Bezpośrednie API</div>
-                    <div class="mode-option" data-mode="proxy">Proxy PHP</div>
+                    <div class="mode-option" data-mode="direct">Bezpośrednie API</div>
+                    <div class="mode-option selected" data-mode="proxy">Proxy PHP</div>
                 </div>
                 
                 <div id="openai-api-settings" class="hidden">
@@ -688,7 +688,7 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                 
                 <div id="proxy-settings" class="hidden">
                     <label for="proxy-url">URL Proxy:</label>
-                    <input type="text" id="proxy-url" class="api-key-input" placeholder="https://twoj-serwer.pl/claude-proxy.php" value="https://twoj-serwer.pl/claude-proxy.php">
+                    <input type="text" id="proxy-url" class="api-key-input" placeholder="https://pymasters.pl/platforma-kodowa-poc/index.php" value="https://pymasters.pl/platforma-kodowa-poc/index.php">
                     <p class="api-key-info">Adres URL do skryptu proxy PHP na Twoim serwerze</p>
                 </div>
                 
@@ -736,12 +736,12 @@ class TestOdwrocWokalizacje(unittest.TestCase):
         
         // Zmienne dotyczące API AI
         let aiProvider = localStorage.getItem('aiProvider') || 'anthropic';
-        let apiMode = localStorage.getItem('apiMode') || 'direct';
+        let apiMode = localStorage.getItem('apiMode') || 'proxy';
         let apiKey = {
             openai: localStorage.getItem('openaiApiKey') || '',
             anthropic: localStorage.getItem('anthropicApiKey') || ''
         };
-        let proxyUrl = localStorage.getItem('proxyUrl') || 'https://twoj-serwer.pl/claude-proxy.php';
+        let proxyUrl = localStorage.getItem('proxyUrl') || 'https://pymasters.pl/platforma-kodowa-poc/index.php';
         
         // Obsługa modalu API
         const apiModal = document.getElementById('api-modal');
