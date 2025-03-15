@@ -1149,8 +1149,12 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                 });
                 
                 if (!response.ok) {
-                    return { success: false, message: `HTTP error ${response.status}` };
-                }
+                        if (response.status === 429) {
+                            throw new Error('Przekroczono limit zapytań. Proszę odczekać chwilę przed kolejnym zapytaniem.');
+                        }
+                        throw new Error(`HTTP error: ${response.status}`);
+                    }
+                        
                 
                 const data = await response.json();
                 
@@ -1474,6 +1478,9 @@ Nie sugeruj dodawania komentarzy, kod powinien sam się wyjaśniać.`;
                     });
                     
                     if (!response.ok) {
+                        if (response.status === 429) {
+                            throw new Error('Przekroczono limit zapytań. Proszę odczekać chwilę przed kolejnym zapytaniem.');
+                        }
                         throw new Error(`HTTP error: ${response.status}`);
                     }
                     
