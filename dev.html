@@ -502,6 +502,132 @@
                 position: static;
             }
         }
+        /* Style dla formatowania kodu w czacie */
+        .ai-content {
+            line-height: 1.6;
+        }
+        .code-block {
+            margin: 10px 0;
+            background-color: #1e2b3a;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2c3a4a;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+        .copy-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .copy-btn:hover {
+            background-color: var(--accent-color);
+        }
+        .code-block pre {
+            margin: 0;
+            padding: 10px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .code-block code {
+            font-family: monospace;
+        }
+        .ai-sidebar.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1001;
+    border-radius: 0;
+    padding: 2rem;
+}
+
+.ai-sidebar.fullscreen .chat-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
+}
+
+.ai-sidebar.fullscreen .chat-messages {
+    height: calc(100% - 150px);
+}
+
+/* Dodaj te style w sekcji <style> */
+    .code-block {
+    margin: 15px 0;
+    background-color: #1e2b3a;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2c3a4a;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    color: #c4d3e0;
+}
+
+.code-block pre {
+    margin: 0;
+    padding: 15px;
+    white-space: pre;
+    overflow-x: auto;
+    background-color: #1a222d;
+    border-top: 1px solid #303e4d;
+}
+
+.code-block code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    tab-size: 4;
+}
+
+/* Style dla podświetlania składni w blokach kodu */
+.code-block {
+    margin: 15px 0;
+    background-color: #1a222d;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: monospace;
+}
+
+.code-header {
+    background-color: #2c3a4a;
+    padding: 8px 12px;
+    color: #c4d3e0;
+    font-size: 0.9rem;
+}
+
+.code-block pre {
+    margin: 0;
+    padding: 12px;
+    overflow-x: auto;
+    white-space: pre !important;
+    tab-size: 4;
+    line-height: 1.5;
+}
+
+.code-block code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    display: block;
+    white-space: pre !important;
+}
     </style>
 </head>
 <body>
@@ -664,14 +790,14 @@ class TestOdwrocWokalizacje(unittest.TestCase):
             <div class="modal-body">
                 <p>Wybierz dostawcę AI:</p>
                 <div class="ai-provider-selector">
-                    <div class="provider-option" data-provider="openai">OpenAI</div>
                     <div class="provider-option selected" data-provider="anthropic">Anthropic (Claude)</div>
+                    <div class="provider-option" data-provider="openai">OpenAI</div>
                 </div>
                 
                 <p>Wybierz tryb:</p>
                 <div class="api-mode-selector">
-                    <div class="mode-option" data-mode="direct">Bezpośrednie API</div>
                     <div class="mode-option selected" data-mode="proxy">Proxy PHP</div>
+                    <div class="mode-option" data-mode="direct">Bezpośrednie API</div>
                 </div>
                 
                 <div id="openai-api-settings" class="hidden">
@@ -919,7 +1045,7 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                             'anthropic-version': '2023-06-01'
                         },
                         body: JSON.stringify({
-                            model: "claude-3-haiku-20240307",
+                            model: "claude-3-7-sonnet-20250219",
                             max_tokens: 50,
                             messages: [
                                 {role: "user", content: "Odpowiedz krótko: Test połączenia z Claude API działa?"}
@@ -976,7 +1102,7 @@ class TestOdwrocWokalizacje(unittest.TestCase):
                 let payload;
                 if (provider === 'anthropic') {
                     payload = {
-                        model: "claude-3-haiku-20240307",
+                        model: "claude-3-7-sonnet-20250219",
                         max_tokens: 50,
                         messages: [
                             {role: "user", content: "Odpowiedz krótko: Test połączenia z proxy działa?"}
@@ -1162,7 +1288,7 @@ Nie sugeruj dodawania komentarzy, kod powinien sam się wyjaśniać.`;
                     let payload;
                     if (aiProvider === 'anthropic') {
                         payload = {
-                            model: "claude-3-haiku-20240307",
+                            model: "claude-3-7-sonnet-20250219",
                             max_tokens: 1000,
                             messages: [
                                 {role: "user", content: prompt}
@@ -1212,7 +1338,7 @@ Nie sugeruj dodawania komentarzy, kod powinien sam się wyjaśniać.`;
                                 'anthropic-version': '2023-06-01'
                             },
                             body: JSON.stringify({
-                                model: "claude-3-haiku-20240307",
+                                model: "claude-3-7-sonnet-20250219",
                                 max_tokens: 1000,
                                 messages: [
                                     {role: "user", content: prompt}
@@ -1300,7 +1426,7 @@ Nie sugeruj dodawania komentarzy, kod powinien sam się wyjaśniać.`;
                     let payload;
                     if (aiProvider === 'anthropic') {
                         payload = {
-                            model: "claude-3-haiku-20240307",
+                            model: "claude-3-7-sonnet-20250219",
                             max_tokens: 1000,
                             messages: [
                                 {role: "user", content: contextMessage}
@@ -1333,12 +1459,67 @@ Nie sugeruj dodawania komentarzy, kod powinien sam się wyjaśniać.`;
                         throw new Error(data.error.message || 'Błąd API');
                     }
                     
-                    // Różne formaty odpowiedzi w zależności od dostawcy
-                    if (aiProvider === 'anthropic') {
-                        loadingMessage.innerHTML = `<p>${data.content[0].text.replace(/\n/g, '<br>')}</p>`;
-                    } else {
-                        loadingMessage.innerHTML = `<p>${data.choices[0].message.content.replace(/\n/g, '<br>')}</p>`;
+                    // Użyj tego:
+                    const messageContent = aiProvider === 'anthropic' ? data.content[0].text : data.choices[0].message.content;
+
+                    // Funkcja pomocnicza do escapowania HTML
+                    function escapeHtml(text) {
+                        return text
+                            .replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(/"/g, "&quot;")
+                            .replace(/'/g, "&#039;");
                     }
+
+                    // Przetwarzanie bloków kodu
+                    let formattedContent = messageContent.replace(/```([\w]*)\n([\s\S]*?)```/g, function(match, language, code) {
+                        // Escapuj HTML w kodzie i zachowaj znaki nowej linii
+                        return `<div class="code-block">
+                                    <div class="code-header">
+                                        <span>${language || 'kod'}</span>
+                                    </div>
+                                    <pre><code class="${language || ''}">${escapeHtml(code)}</code></pre>
+                                </div>`;
+                    });
+
+                    // Zamień znaki nowej linii na <br> tylko w zwykłym tekście (poza blokami kodu)
+                    let parts = formattedContent.split(/<div class="code-block">|<\/pre><\/div>/);
+                    for (let i = 0; i < parts.length; i++) {
+                        // Części o parzystych indeksach to zwykły tekst
+                        if (i % 2 === 0) {
+                            parts[i] = parts[i].replace(/\n/g, '<br>');
+                        }
+                    }
+                    formattedContent = parts.join('');
+
+                    loadingMessage.innerHTML = `<div class="ai-content">${formattedContent}</div>`;
+
+                    // Podświetl składnię kodu
+                    loadingMessage.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightBlock(block);
+                    });
+                    console.log("code")
+// Dodaj nasłuchiwacze zdarzeń dla przycisków kopiowania
+loadingMessage.querySelectorAll('.copy-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const codeBlock = this.parentElement.nextElementSibling;
+        const code = codeBlock.textContent;
+        
+        navigator.clipboard.writeText(code).then(() => {
+            const originalText = this.textContent;
+            this.textContent = 'Skopiowano!';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                this.textContent = originalText;
+                this.disabled = false;
+            }, 2000);
+        }).catch(err => {
+            console.error('Błąd kopiowania:', err);
+        });
+    });
+});
                 } else {
                     // Bezpośrednie wywołanie API
                     if (aiProvider === 'anthropic') {
@@ -1350,7 +1531,7 @@ Nie sugeruj dodawania komentarzy, kod powinien sam się wyjaśniać.`;
                                 'anthropic-version': '2023-06-01'
                             },
                             body: JSON.stringify({
-                                model: "claude-3-haiku-20240307",
+                                model: "claude-3-7-sonnet-20250219",
                                 max_tokens: 1000,
                                 messages: [
                                     {role: "user", content: contextMessage}
@@ -1416,8 +1597,21 @@ Nie sugeruj dodawania komentarzy, kod powinien sam się wyjaśniać.`;
                 e.preventDefault();
                 chatSendButton.click();
             }
+        });       
+        chatInput.addEventListener('focus', () => {
+            const aiSidebar = document.querySelector('.ai-sidebar');
+            aiSidebar.style.height = 'calc(100vh - 100px)';
+            chatInput.rows = 5;
         });
-        
+
+        chatInput.addEventListener('blur', () => {
+            if (chatInput.value.trim() === '') {
+                const aiSidebar = document.querySelector('.ai-sidebar');
+                aiSidebar.style.height = 'calc(100vh - 150px)';
+                chatInput.rows = 3;
+            }
+        });
+
         // Funkcja do wykonania testów
         async function runTests() {
             const code = editor.getValue();
@@ -1788,6 +1982,110 @@ else:
             // Inicjalizacja statusu API
             updateApiKeyStatus();
         });
+// W głównym skrypcie, po inicjalizacji elementów
+
+// Pobierz elementy czatu
+const chatMessages = document.getElementById('chat-messages');
+const aiSidebar = document.querySelector('.ai-sidebar');
+
+// Rozszerz czat na pełny ekran podczas interakcji
+chatInput.addEventListener('focus', expandChat);
+chatMessages.addEventListener('mousedown', expandChat); // Do zaznaczania tekstu
+chatMessages.addEventListener('touchstart', expandChat); // Dla urządzeń mobilnych
+
+// Zwiń czat, gdy klikniemy poza nim
+document.addEventListener('mousedown', function(event) {
+    // Sprawdź, czy kliknięcie było poza sekcją czatu
+    if (!aiSidebar.contains(event.target) && aiSidebar.classList.contains('fullscreen')) {
+        collapseChat();
+    }
+});
+
+// Dodaj nasłuchiwacze, aby czat zostawał rozszerzony podczas interakcji
+chatMessages.addEventListener('scroll', function() {
+    // Jeśli użytkownik przewija czat, resetuj timer zwężania
+    if (collapseTimer) {
+        clearTimeout(collapseTimer);
+        collapseTimer = setTimeout(collapseChat, 3000); // 3 sekundy bezczynności
+    }
+});
+
+// Zmienna do przechowywania timera zwężania
+let collapseTimer = null;
+
+// Dodaj nasłuchiwacze dla przewijania i ruchu myszy
+chatInput.addEventListener('input', function() {
+    // Resetuj timer podczas pisania
+    if (collapseTimer) clearTimeout(collapseTimer);
+});
+
+chatInput.addEventListener('blur', function() {
+    // Po utracie fokusu przez pole tekstowe, ustaw timer zwężania
+    if (aiSidebar.classList.contains('fullscreen')) {
+        collapseTimer = setTimeout(collapseChat, 3000); // 3 sekundy bezczynności
+    }
+});
+
+// Anuluj timer, gdy najedzie myszą
+aiSidebar.addEventListener('mousemove', function() {
+    if (collapseTimer) {
+        clearTimeout(collapseTimer);
+        collapseTimer = null;
+    }
+});
+
+// Ustaw timer ponownie, gdy mysz opuści obszar
+aiSidebar.addEventListener('mouseleave', function() {
+    if (aiSidebar.classList.contains('fullscreen')) {
+        collapseTimer = setTimeout(collapseChat, 3000);
+    }
+});
+window.copyCode = function(button) {
+    const codeBlock = button.parentElement.nextElementSibling;
+    const code = codeBlock.textContent;
+    
+    navigator.clipboard.writeText(code).then(() => {
+        const originalText = button.textContent;
+        button.textContent = 'Skopiowano!';
+        button.disabled = true;
+        
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+        }, 2000);
+    }).catch(err => {
+        console.error('Błąd kopiowania:', err);
+    });
+};
+// Funkcja do rozszerzania czatu
+function expandChat() {
+    const aiSidebar = document.querySelector('.ai-sidebar');
+    const mainContent = document.querySelector('.main-content');
+    
+    if (!aiSidebar.classList.contains('fullscreen')) {
+        aiSidebar.classList.add('fullscreen');
+        mainContent.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+        
+        // Przewiń czat do dołu
+        setTimeout(() => {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 100);
+    }
+}
+
+// Funkcja do zwężania czatu
+function collapseChat() {
+    const aiSidebar = document.querySelector('.ai-sidebar');
+    const mainContent = document.querySelector('.main-content');
+    
+    if (aiSidebar.classList.contains('fullscreen')) {
+        aiSidebar.classList.remove('fullscreen');
+        mainContent.style.display = 'block';
+        document.body.style.overflow = 'auto';
+    }
+}
     </script>
 </body>
 </html>
