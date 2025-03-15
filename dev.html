@@ -628,6 +628,30 @@
     display: block;
     white-space: pre !important;
 }
+.close-fullscreen {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    /* width: 40px; */
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    display: none;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.ai-sidebar.fullscreen .close-fullscreen {
+    display: block;
+}
+
+.close-fullscreen:hover {
+    background-color: var(--accent-color);
+}
     </style>
 </head>
 <body>
@@ -641,7 +665,7 @@
             <a href="#">Społeczność</a>
             <a href="#">Pomoc</a>
         </nav>
-        <button class="btn" id="api-key-btn">Ustaw API</button>
+        <button class="btn hidden" id="api-key-btn">Ustaw API</button>
     </header>
     
     <main>
@@ -2124,6 +2148,29 @@ function collapseChat() {
         document.body.style.overflow = 'auto';
     }
 }
+// Dodaj przycisk zamykania do ai-sidebar
+const closeButton = document.createElement('button');
+closeButton.className = 'close-fullscreen';
+closeButton.innerHTML = '× Zamknij pełny ekran';
+closeButton.title = 'Zamknij pełny ekran';
+aiSidebar.appendChild(closeButton);
+// Zmień styl przycisku zamykania, żeby był zawsze widoczny podczas pełnoekranowego trybu
+closeButton.style.position = 'fixed';
+closeButton.style.top = '15px';
+closeButton.style.right = '15px';
+closeButton.style.zIndex = '1002'; // Wyższy z-indexx
+
+// Dodaj nasłuchiwacz dla przycisku zamykania
+closeButton.addEventListener('click', function() {
+    collapseChat();
+});
+
+// Dodaj obsługę klawisza Escape do zamykania pełnego ekranu
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && aiSidebar.classList.contains('fullscreen')) {
+        collapseChat();
+    }
+});
     </script>
 </body>
 </html>
